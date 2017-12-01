@@ -1,0 +1,45 @@
+SELECT
+    *,
+    0 as MinPercent, 
+    12000 as MaxPercent,
+    (12000*.8) as TargetPercent,
+    5000+(100000 * (.0456/42)) as PlannedTotalSlurry,
+    1000000 - BlenderPropTotal as RemainingProp,
+    (5000+(100000 * (.0456/42))) - SlurryTotal as RemainingSlurry,
+    ((5000+(100000 * (.0456/42))) - SlurryTotal) / 90 as TimeRemaining
+INTO
+    completion1
+FROM
+    PiEventHub
+  
+select
+    wellname,
+    AVG(TreatingPressure) as PressureChange
+into completions2
+from 
+    PiEventHub
+group by wellname, slidingwindow(second,10)
+
+
+SELECT
+    ID,
+    Stage,
+    WellName,
+    TimeStamp,
+    TreatingPressure
+INTO
+    completion3
+FROM
+    PiEventHub
+    
+SELECT c3.PressureChange - c1.TreatingPressure as PressureChange
+into completion4
+    from completion1 c1 join completions2 c3
+ON DATEDIFF(second,c1,c3) BETWEEN 0 AND 15
+
+
+
+ 
+
+
+ 
